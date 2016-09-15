@@ -1,0 +1,55 @@
+public String createTransaction(LoanTransaction lt) {
+		String out = null;
+		Date date = new Date(Calendar.getInstance().getTime().getTime());
+		
+		boolean valid = true;
+		
+		//Check for holiday for today's date
+		
+		//Check Approval
+		Connection c;
+		PreparedStatement query;
+		ResultSet result;
+		try {
+			c = DatabaseConnection.getConnection();
+			query = c.prepareStatement("select status from loan_approval where loan_id=?");
+			query.setDouble(1, lt.getLoanId());
+			result = query.executeQuery();
+			result.next();
+			if(!(result.getString(1)).equals("Y"))
+				valid = false;
+			c.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//Check Permissions and update valid
+		
+		//Create Transaction
+		if(valid){
+			
+			try {
+				//Creating Transaction Id
+				c = DatabaseConnection.getConnection();
+				query = c.prepareStatement("select MAX(TRANS_ID) from TRANSACTION");
+				result = query.executeQuery();
+				result.next();
+				lt.setTransactionId(result.getDouble(1) + 1);
+				
+				//Creating Transaction
+				
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			
+		}
+		else
+			out = "Failure";
+		
+		return out;
+	}
